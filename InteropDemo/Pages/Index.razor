@@ -1,0 +1,31 @@
+﻿@page "/"
+@inject IJSRuntime JS
+
+<PageTitle>Index</PageTitle>
+
+<button class="btn btn-primary" @onclick="@(() => PrintMessage("test", "123"))">Alert</button>
+
+@code {
+    private IJSObjectReference _module;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./InterOpLib.js");
+        }
+    }
+
+    protected async Task PrintMessage(string title, string message)
+    {
+        try
+        {
+            await _module.InvokeVoidAsync("showAlert", title, message);
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+    }
+}
